@@ -21,7 +21,7 @@ namespace AdminBMC
         //private List<MessageData> messages = new List<MessageData>();
 
         // MySQL connection
-        MySqlConnection con = new MySqlConnection("SERVER = 192.168.1.9; DATABASE = sys; UID = db; PASSWORD = Saks@2468;");
+        MySqlConnection con = new MySqlConnection("SERVER = 192.168.1.7; DATABASE = sys; UID = db; PASSWORD = Saks@2468;");
 
         // DeviceId field
         private string deviceId;
@@ -29,6 +29,19 @@ namespace AdminBMC
         public Form1()
         {
             InitializeComponent();
+            this.FormClosing += Form1_FormClosing;
+        }
+
+        private void Form1_FormClosing(object? sender, FormClosingEventArgs e)
+        {
+            if (connect)
+            {
+                mqttClient.Disconnect();
+                Connbtn.Text = "Connect";
+                statLbl.Text = "Not Connected to broker";
+                connect = false;
+                MessageBox.Show("Disconnected from MQTT broker!");
+            }
         }
 
         private string GenerateRandomString(int length)
@@ -166,7 +179,7 @@ namespace AdminBMC
         {
             try
             {
-                string query = "SELECT * FROM userdata";
+                string query = "SELECT * FROM users";
                 MySqlDataAdapter cmd = new MySqlDataAdapter(query, con);
 
                 DataTable dt = new DataTable();
@@ -275,7 +288,7 @@ namespace AdminBMC
             try
             {
                     con.Open();
-                    string query = "INSERT INTO userdata (username, password, deviceId, Topic, Status) VALUES (@username, @password, @deviceId, @topic, @status)";
+                    string query = "INSERT INTO users (username, password, Topics, DeviceID, Status) VALUES (@username, @password, @topic, @deviceid, @status)";
 
                     using (MySqlCommand command = new MySqlCommand(query, con))
                     {
@@ -290,7 +303,7 @@ namespace AdminBMC
                         if (rowsAffected > 0)
                         {
                             MessageBox.Show("User added successfully!");
-                            string updateStatusQuery = "UPDATE userdata SET status = 1 WHERE deviceId = @deviceId";
+                            string updateStatusQuery = "UPDATE users SET status = 1 WHERE DeviceID = @deviceId";
                             using (MySqlCommand updateStatusCommand = new MySqlCommand(updateStatusQuery, con))
                             {
                                 updateStatusCommand.Parameters.AddWithValue("@deviceId", deviceId);
