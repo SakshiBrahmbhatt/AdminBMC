@@ -7,6 +7,7 @@ using uPLibrary.Networking.M2Mqtt.Exceptions;
 using MySql.Data.MySqlClient;
 using System.Data;
 using uPLibrary.Networking.M2Mqtt.Messages;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.ListView;
 
 namespace AdminBMC
 {
@@ -24,13 +25,19 @@ namespace AdminBMC
 
         // DeviceId field
         private string deviceId;
-        private string username;
 
         public Form1()
         {
             InitializeComponent();
         }
 
+        private string GenerateRandomString(int length)
+        {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            Random random = new Random();
+            return new string(Enumerable.Repeat(chars, length)
+                .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
         private void Connbtn_Click(object sender, EventArgs e)
         {
             if (connect == false)
@@ -161,7 +168,7 @@ namespace AdminBMC
             {
                 string query = "SELECT * FROM users";
                 MySqlDataAdapter cmd = new MySqlDataAdapter(query, con);
-                
+
                 DataTable dt = new DataTable();
                 cmd.Fill(dt);
                 users.DataSource = dt;
@@ -246,5 +253,70 @@ namespace AdminBMC
             da.Fill(ds);
             serverData.DataSource = ds.Tables[0];
         }
+
+        private void addUser_Click(object sender, EventArgs e)
+        {
+            string username = usernameValue.Text;
+            string password = passwordValue.Text;
+            string topic = topicValue.SelectedItem.ToString();
+
+            string deviceId = GenerateRandomString(5);
+
+            InsertUserData(username, password, deviceId, topic);
+            
+            usernameValue.Clear();
+            passwordValue.Clear();
+            topicValue.SelectedIndex = -1;
+            
+        }
+
+        private void InsertUserData(string username, string password, string deviceId, string topic)
+        {
+            try
+            {
+                    con.Open();
+                    string query = "INSERT INTO users (username, password, deviceId, Topic, Status) VALUES (@username, @password, @deviceId, @topic, @status)";
+
+                    using (MySqlCommand command = new MySqlCommand(query, con))
+                    {
+                        command.Parameters.AddWithValue("@username", username);
+                        command.Parameters.AddWithValue("@password", password);
+                        command.Parameters.AddWithValue("@deviceid", deviceId);
+                        command.Parameters.AddWithValue("@topic", topic);
+                        command.Parameters.AddWithValue("@status", 1);
+
+                        int rowsAffected = command.ExecuteNonQuery();
+
+                        if (rowsAffected > 0)
+                        {
+                            MessageBox.Show("User added successfully!");
+                            string updateStatusQuery = "UPDATE users SET status = 1 WHERE deviceId = @deviceId";
+                            using (MySqlCommand updateStatusCommand = new MySqlCommand(updateStatusQuery, con))
+                            {
+                                updateStatusCommand.Parameters.AddWithValue("@deviceId", deviceId);
+                                updateStatusCommand.ExecuteNonQuery();
+                            }
+                            LoadUsersData();
+                        }
+                        else
+                        {
+                            MessageBox.Show("Failed to add user. Please check your inputs.");
+                        }
+                    }
+                
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}");
+            }
+            finally
+            {
+                con.Close();
+            }
+        }
+
+        
+
+        
     }
 }

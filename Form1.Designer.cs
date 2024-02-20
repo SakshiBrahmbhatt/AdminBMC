@@ -39,9 +39,17 @@
             topicBox = new TextBox();
             Connbtn = new Button();
             subBtn = new Button();
+            groupBox1 = new GroupBox();
+            topicValue = new ComboBox();
+            label3 = new Label();
+            passwordValue = new TextBox();
+            label2 = new Label();
+            usernameValue = new TextBox();
+            label1 = new Label();
             ((System.ComponentModel.ISupportInitialize)serverData).BeginInit();
             ((System.ComponentModel.ISupportInitialize)subscribeTopic).BeginInit();
             ((System.ComponentModel.ISupportInitialize)users).BeginInit();
+            groupBox1.SuspendLayout();
             SuspendLayout();
             // 
             // serverData
@@ -116,12 +124,13 @@
             // 
             // addUser
             // 
-            addUser.Location = new Point(869, 205);
+            addUser.Location = new Point(29, 177);
             addUser.Name = "addUser";
             addUser.Size = new Size(138, 29);
             addUser.TabIndex = 14;
             addUser.Text = "Add New User";
             addUser.UseVisualStyleBackColor = true;
+            addUser.Click += addUser_Click;
             // 
             // topicBox
             // 
@@ -151,15 +160,81 @@
             subBtn.UseVisualStyleBackColor = true;
             subBtn.Click += subBtn_Click;
             // 
+            // groupBox1
+            // 
+            groupBox1.Controls.Add(topicValue);
+            groupBox1.Controls.Add(label3);
+            groupBox1.Controls.Add(passwordValue);
+            groupBox1.Controls.Add(label2);
+            groupBox1.Controls.Add(addUser);
+            groupBox1.Controls.Add(usernameValue);
+            groupBox1.Controls.Add(label1);
+            groupBox1.Location = new Point(1367, 12);
+            groupBox1.Name = "groupBox1";
+            groupBox1.Size = new Size(304, 230);
+            groupBox1.TabIndex = 18;
+            groupBox1.TabStop = false;
+            groupBox1.Text = "Add User";
+            // 
+            // topicValue
+            // 
+            topicValue.FormattingEnabled = true;
+            topicValue.Items.AddRange(new object[] { "1", "2", "3", "4" });
+            topicValue.Location = new Point(118, 130);
+            topicValue.Name = "topicValue";
+            topicValue.Size = new Size(151, 28);
+            topicValue.TabIndex = 5;
+            // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.Location = new Point(29, 133);
+            label3.Name = "label3";
+            label3.Size = new Size(51, 20);
+            label3.TabIndex = 4;
+            label3.Text = "Topics";
+            // 
+            // passwordValue
+            // 
+            passwordValue.Location = new Point(118, 85);
+            passwordValue.Name = "passwordValue";
+            passwordValue.Size = new Size(151, 27);
+            passwordValue.TabIndex = 3;
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Location = new Point(29, 88);
+            label2.Name = "label2";
+            label2.Size = new Size(70, 20);
+            label2.TabIndex = 2;
+            label2.Text = "Password";
+            // 
+            // usernameValue
+            // 
+            usernameValue.Location = new Point(118, 39);
+            usernameValue.Name = "usernameValue";
+            usernameValue.Size = new Size(151, 27);
+            usernameValue.TabIndex = 1;
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new Point(29, 42);
+            label1.Name = "label1";
+            label1.Size = new Size(75, 20);
+            label1.TabIndex = 0;
+            label1.Text = "Username";
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1792, 554);
+            Controls.Add(groupBox1);
             Controls.Add(subBtn);
             Controls.Add(Connbtn);
             Controls.Add(topicBox);
-            Controls.Add(addUser);
             Controls.Add(users);
             Controls.Add(searchBtn);
             Controls.Add(searchText);
@@ -172,6 +247,8 @@
             ((System.ComponentModel.ISupportInitialize)serverData).EndInit();
             ((System.ComponentModel.ISupportInitialize)subscribeTopic).EndInit();
             ((System.ComponentModel.ISupportInitialize)users).EndInit();
+            groupBox1.ResumeLayout(false);
+            groupBox1.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -189,5 +266,12 @@
         private TextBox topicBox;
         private Button Connbtn;
         private Button subBtn;
+        private GroupBox groupBox1;
+        private ComboBox topicValue;
+        private Label label3;
+        private TextBox passwordValue;
+        private Label label2;
+        private TextBox usernameValue;
+        private Label label1;
     }
 }
