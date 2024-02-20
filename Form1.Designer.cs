@@ -179,7 +179,7 @@
             // topicValue
             // 
             topicValue.FormattingEnabled = true;
-            topicValue.Items.AddRange(new object[] { "1", "2", "3", "4" });
+            topicValue.Items.AddRange(new object[] { "0123456789/Data" });
             topicValue.Location = new Point(118, 130);
             topicValue.Name = "topicValue";
             topicValue.Size = new Size(151, 28);

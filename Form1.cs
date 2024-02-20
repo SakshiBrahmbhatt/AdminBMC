@@ -166,7 +166,7 @@ namespace AdminBMC
         {
             try
             {
-                string query = "SELECT * FROM users";
+                string query = "SELECT * FROM userdata";
                 MySqlDataAdapter cmd = new MySqlDataAdapter(query, con);
 
                 DataTable dt = new DataTable();
@@ -275,7 +275,7 @@ namespace AdminBMC
             try
             {
                     con.Open();
-                    string query = "INSERT INTO users (username, password, deviceId, Topic, Status) VALUES (@username, @password, @deviceId, @topic, @status)";
+                    string query = "INSERT INTO userdata (username, password, deviceId, Topic, Status) VALUES (@username, @password, @deviceId, @topic, @status)";
 
                     using (MySqlCommand command = new MySqlCommand(query, con))
                     {
@@ -290,7 +290,7 @@ namespace AdminBMC
                         if (rowsAffected > 0)
                         {
                             MessageBox.Show("User added successfully!");
-                            string updateStatusQuery = "UPDATE users SET status = 1 WHERE deviceId = @deviceId";
+                            string updateStatusQuery = "UPDATE userdata SET status = 1 WHERE deviceId = @deviceId";
                             using (MySqlCommand updateStatusCommand = new MySqlCommand(updateStatusQuery, con))
                             {
                                 updateStatusCommand.Parameters.AddWithValue("@deviceId", deviceId);
