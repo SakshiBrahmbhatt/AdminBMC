@@ -226,6 +226,7 @@ namespace AdminBMC
                         string id = reader["DeviceID"].ToString();
                         IDs.Add(id);
                     }
+                    colHeader.Items.Add("ALL");
                     colHeader.Items.AddRange(IDs.ToArray());
                 }
             }
@@ -358,7 +359,7 @@ namespace AdminBMC
         {
             if (connect)
             {
-                if(!string.IsNullOrEmpty(usernameValue.Text) && !string.IsNullOrEmpty(passwordValue.Text) && !string.IsNullOrEmpty(topicValue.Text))
+                if (!string.IsNullOrEmpty(usernameValue.Text) && !string.IsNullOrEmpty(passwordValue.Text) && !string.IsNullOrEmpty(topicValue.Text))
                 {
                     string username = usernameValue.Text;
                     string password = passwordValue.Text;
@@ -461,5 +462,101 @@ namespace AdminBMC
                 con.Close();
             }
         }
+
+        private void searchBtn_Click(object sender, EventArgs e)
+        {
+            if (!string.IsNullOrEmpty(searchText.Text))
+            {
+                try
+                {
+                    con.Open();
+                    MySqlCommand cmd = new MySqlCommand("SELECT * FROM bmcmqtt WHERE Topic = @Topic", con);
+                    cmd.Parameters.AddWithValue("@Topic", searchText.Text);
+
+                    MySqlDataAdapter da = new MySqlDataAdapter(cmd);
+                    DataTable dt = new DataTable();
+                    da.Fill(dt);
+                    serverData.DataSource = dt;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error selecting from bmcmqtt table: " + ex.Message);
+                }
+                finally
+                {
+                    con.Close();
+                }
+            }
+            else
+            {
+                MessageBox.Show("Enter the value to search the row");
+                try
+                {
+                    con.Open();
+                    MySqlCommand cmd = new MySqlCommand("SELECT * FROM bmcmqtt", con);
+
+                    MySqlDataAdapter da = new MySqlDataAdapter(cmd);
+                    DataTable dt = new DataTable();
+                    da.Fill(dt);
+                    serverData.DataSource = dt;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error selecting from bmcmqtt table: " + ex.Message);
+                }
+                finally
+                {
+                    con.Close();
+                }
+            }
+        }
+
+        private void colHeader_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            string selectedDeviceId = colHeader.SelectedItem.ToString();
+            if( selectedDeviceId != "ALL")
+            {
+                try
+                {
+                    con.Open();
+                    MySqlCommand cmd = new MySqlCommand("SELECT * FROM bmcmqtt WHERE DeviceId = @deviceId", con);
+                    cmd.Parameters.AddWithValue("@deviceId", selectedDeviceId);
+
+                    MySqlDataAdapter da = new MySqlDataAdapter(cmd);
+                    DataTable dt = new DataTable();
+                    da.Fill(dt);
+                    serverData.DataSource = dt;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error selecting from bmcmqtt table: " + ex.Message);
+                }
+                finally
+                {
+                    con.Close();
+                }
+            }
+            else
+            {
+                try
+                {
+                    con.Open();
+                    MySqlCommand cmd = new MySqlCommand("SELECT * FROM bmcmqtt", con);
+                    MySqlDataAdapter da = new MySqlDataAdapter(cmd);
+                    DataTable dt = new DataTable();
+                    da.Fill(dt);
+                    serverData.DataSource = dt;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error selecting from bmcmqtt table: " + ex.Message);
+                }
+                finally
+                {
+                    con.Close();
+                }
+            }
+        }
     }
+    
 }

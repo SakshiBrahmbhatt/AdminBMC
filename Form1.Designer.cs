@@ -99,6 +99,7 @@
             searchBtn.TabIndex = 12;
             searchBtn.Text = "Search";
             searchBtn.UseVisualStyleBackColor = true;
+            searchBtn.Click += searchBtn_Click;
             // 
             // users1
             // 
@@ -223,6 +224,7 @@
             colHeader.Size = new Size(151, 28);
             colHeader.TabIndex = 19;
             colHeader.Text = "Select Device ID";
+            colHeader.SelectedIndexChanged += colHeader_SelectedIndexChanged;
             // 
             // Form1
             // 
