@@ -31,10 +31,9 @@
             serverData = new DataGridView();
             subscribeTopic = new DataGridView();
             statLbl = new Label();
-            filterMyData = new CheckBox();
             searchText = new TextBox();
             searchBtn = new Button();
-            users = new DataGridView();
+            users1 = new DataGridView();
             addUser = new Button();
             topicBox = new TextBox();
             Connbtn = new Button();
@@ -46,9 +45,10 @@
             label2 = new Label();
             usernameValue = new TextBox();
             label1 = new Label();
+            colHeader = new ComboBox();
             ((System.ComponentModel.ISupportInitialize)serverData).BeginInit();
             ((System.ComponentModel.ISupportInitialize)subscribeTopic).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)users).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)users1).BeginInit();
             groupBox1.SuspendLayout();
             SuspendLayout();
             // 
@@ -73,7 +73,6 @@
             subscribeTopic.RowHeadersWidth = 51;
             subscribeTopic.Size = new Size(455, 187);
             subscribeTopic.TabIndex = 8;
-            subscribeTopic.CellContentClick += subscribeTopic_CellContentClick;
             // 
             // statLbl
             // 
@@ -84,19 +83,9 @@
             statLbl.TabIndex = 9;
             statLbl.Text = "Not connected to broker";
             // 
-            // filterMyData
-            // 
-            filterMyData.AutoSize = true;
-            filterMyData.Location = new Point(12, 237);
-            filterMyData.Name = "filterMyData";
-            filterMyData.Size = new Size(157, 24);
-            filterMyData.TabIndex = 10;
-            filterMyData.Text = "Only show my data";
-            filterMyData.UseVisualStyleBackColor = true;
-            // 
             // searchText
             // 
-            searchText.Location = new Point(214, 238);
+            searchText.Location = new Point(198, 238);
             searchText.Name = "searchText";
             searchText.PlaceholderText = "topic/#";
             searchText.Size = new Size(166, 27);
@@ -104,23 +93,23 @@
             // 
             // searchBtn
             // 
-            searchBtn.Location = new Point(386, 237);
+            searchBtn.Location = new Point(370, 236);
             searchBtn.Name = "searchBtn";
             searchBtn.Size = new Size(94, 29);
             searchBtn.TabIndex = 12;
             searchBtn.Text = "Search";
             searchBtn.UseVisualStyleBackColor = true;
             // 
-            // users
+            // users1
             // 
-            users.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-            users.BackgroundColor = SystemColors.InactiveCaption;
-            users.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            users.Location = new Point(869, 12);
-            users.Name = "users";
-            users.RowHeadersWidth = 51;
-            users.Size = new Size(455, 187);
-            users.TabIndex = 13;
+            users1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            users1.BackgroundColor = SystemColors.InactiveCaption;
+            users1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            users1.Location = new Point(869, 12);
+            users1.Name = "users1";
+            users1.RowHeadersWidth = 51;
+            users1.Size = new Size(455, 187);
+            users1.TabIndex = 13;
             // 
             // addUser
             // 
@@ -179,11 +168,11 @@
             // topicValue
             // 
             topicValue.FormattingEnabled = true;
-            topicValue.Items.AddRange(new object[] { "0123456789/Data" });
             topicValue.Location = new Point(118, 130);
             topicValue.Name = "topicValue";
             topicValue.Size = new Size(151, 28);
             topicValue.TabIndex = 5;
+            topicValue.Text = "Select";
             // 
             // label3
             // 
@@ -226,19 +215,28 @@
             label1.TabIndex = 0;
             label1.Text = "Username";
             // 
+            // colHeader
+            // 
+            colHeader.FormattingEnabled = true;
+            colHeader.Location = new Point(23, 238);
+            colHeader.Name = "colHeader";
+            colHeader.Size = new Size(151, 28);
+            colHeader.TabIndex = 19;
+            colHeader.Text = "Select Device ID";
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1792, 554);
+            Controls.Add(colHeader);
             Controls.Add(groupBox1);
             Controls.Add(subBtn);
             Controls.Add(Connbtn);
             Controls.Add(topicBox);
-            Controls.Add(users);
+            Controls.Add(users1);
             Controls.Add(searchBtn);
             Controls.Add(searchText);
-            Controls.Add(filterMyData);
             Controls.Add(statLbl);
             Controls.Add(subscribeTopic);
             Controls.Add(serverData);
@@ -246,7 +244,7 @@
             Text = "Form1";
             ((System.ComponentModel.ISupportInitialize)serverData).EndInit();
             ((System.ComponentModel.ISupportInitialize)subscribeTopic).EndInit();
-            ((System.ComponentModel.ISupportInitialize)users).EndInit();
+            ((System.ComponentModel.ISupportInitialize)users1).EndInit();
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
             ResumeLayout(false);
@@ -258,10 +256,9 @@
         private DataGridView serverData;
         private DataGridView subscribeTopic;
         private Label statLbl;
-        private CheckBox filterMyData;
         private TextBox searchText;
         private Button searchBtn;
-        private DataGridView users;
+        private DataGridView users1;
         private Button addUser;
         private TextBox topicBox;
         private Button Connbtn;
@@ -273,5 +270,6 @@
         private Label label2;
         private TextBox usernameValue;
         private Label label1;
+        private ComboBox colHeader;
     }
 }

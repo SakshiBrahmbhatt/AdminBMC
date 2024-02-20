@@ -8,6 +8,7 @@ using MySql.Data.MySqlClient;
 using System.Data;
 using uPLibrary.Networking.M2Mqtt.Messages;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.ListView;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace AdminBMC
 {
@@ -18,10 +19,11 @@ namespace AdminBMC
         bool connect = false;
         private MqttClient mqttClient;
         private List<string> subscribedTopics = new List<string>();
+        private List<string> IDs = new List<string>();
         //private List<MessageData> messages = new List<MessageData>();
 
         // MySQL connection
-        MySqlConnection con = new MySqlConnection("SERVER = 192.168.1.7; DATABASE = sys; UID = db; PASSWORD = Saks@2468;");
+        MySqlConnection con = new MySqlConnection("SERVER = 192.168.240.145; DATABASE = sys; UID = db; PASSWORD = Saks@2468;");
 
         // DeviceId field
         private string deviceId;
@@ -30,6 +32,26 @@ namespace AdminBMC
         {
             InitializeComponent();
             this.FormClosing += Form1_FormClosing;
+            deviceId = Properties.Settings.Default.DeviceId;
+
+            subscribeTopic.CellContentClick += SubscribeTopic_CellContentClick; ;
+            users1.CellContentClick += Users_CellContentClick; ;
+        }
+
+        private void Users_CellContentClick(object? sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex >= 0 && e.ColumnIndex == 5)
+            {
+                ToggleUserStatus(e.RowIndex);
+            }
+        }
+
+        private void SubscribeTopic_CellContentClick(object? sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex >= 0 && e.ColumnIndex == 2)
+            {
+                ToggleSubscriptionStatus(e.RowIndex);
+            }
         }
 
         private void Form1_FormClosing(object? sender, FormClosingEventArgs e)
@@ -67,6 +89,7 @@ namespace AdminBMC
                     {
                         con.Open();
                         LoadSubscribedTopics();
+                        LoadIds();
                         LoadUsersData();
                         con.Close();
                     }
@@ -144,9 +167,72 @@ namespace AdminBMC
             }
         }
 
-        private void subscribeTopic_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        private void ToggleSubscriptionStatus(int rowIndex)
         {
+            try
+            {
+                con.Open();
 
+                // Get the topic and current status from the DataGridView
+                string topic = subscribeTopic.Rows[rowIndex].Cells["Topic"].Value.ToString();
+                int currentStatus = Convert.ToInt32(subscribeTopic.Rows[rowIndex].Cells["Status"].Value);
+
+                // Toggle the status (0 to 1, 1 to 0)
+                int newStatus = 1 - currentStatus;
+
+                // Update the status in the DataGridView
+                subscribeTopic.Rows[rowIndex].Cells["Status"].Value = newStatus;
+
+                // Update the status in the database
+                string updateQuery = "UPDATE subscribe_topic SET Status = @Status WHERE Topic = @Topic";
+                MySqlCommand cmd = new MySqlCommand(updateQuery, con);
+                cmd.Parameters.AddWithValue("@Status", newStatus);
+                cmd.Parameters.AddWithValue("@Topic", topic);
+                cmd.ExecuteNonQuery();
+
+                // Subscribe or unsubscribe based on the new status
+                if (newStatus == 1)
+                {
+                    mqttClient.Subscribe(new string[] { topic }, new byte[] { MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE });
+                }
+                else
+                {
+                    mqttClient.Unsubscribe(new string[] { topic });
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error updating status: {ex.Message}");
+            }
+            finally
+            {
+                con.Close();
+            }
+        }
+
+        private void LoadIds()
+        {
+            try
+            {
+                IDs.Clear();
+                colHeader.Items.Clear();
+
+                string query = "SELECT DeviceID FROM users";
+                MySqlCommand cmd = new MySqlCommand(query, con);
+                using (MySqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        string id = reader["DeviceID"].ToString();
+                        IDs.Add(id);
+                    }
+                    colHeader.Items.AddRange(IDs.ToArray());
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error loading Device IDs: " + ex.Message);
+            }
         }
 
         private void LoadSubscribedTopics()
@@ -154,6 +240,7 @@ namespace AdminBMC
             try
             {
                 subscribedTopics.Clear();
+                topicValue.Items.Clear();
 
                 string query = "SELECT Topic FROM subscribe_topic";
                 MySqlCommand cmd = new MySqlCommand(query, con);
@@ -163,10 +250,10 @@ namespace AdminBMC
                     {
                         string topic = reader["Topic"].ToString();
                         subscribedTopics.Add(topic);
-
                         // Subscribe to the topic
                         mqttClient.Subscribe(new string[] { topic }, new byte[] { MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE });
                     }
+                    topicValue.Items.AddRange(subscribedTopics.ToArray());
                 }
             }
             catch (Exception ex)
@@ -184,7 +271,7 @@ namespace AdminBMC
 
                 DataTable dt = new DataTable();
                 cmd.Fill(dt);
-                users.DataSource = dt;
+                users1.DataSource = dt;
 
             }
             catch (Exception ex)
@@ -269,54 +356,68 @@ namespace AdminBMC
 
         private void addUser_Click(object sender, EventArgs e)
         {
-            string username = usernameValue.Text;
-            string password = passwordValue.Text;
-            string topic = topicValue.SelectedItem.ToString();
+            if (connect)
+            {
+                if(!string.IsNullOrEmpty(usernameValue.Text) && !string.IsNullOrEmpty(passwordValue.Text) && !string.IsNullOrEmpty(topicValue.Text))
+                {
+                    string username = usernameValue.Text;
+                    string password = passwordValue.Text;
+                    string topic = topicValue.SelectedItem.ToString();
 
-            string deviceId = GenerateRandomString(5);
+                    string deviceId = GenerateRandomString(5);
 
-            InsertUserData(username, password, deviceId, topic);
-            
-            usernameValue.Clear();
-            passwordValue.Clear();
-            topicValue.SelectedIndex = -1;
-            
+                    InsertUserData(username, password, deviceId, topic);
+
+                    usernameValue.Clear();
+                    passwordValue.Clear();
+                    topicValue.SelectedIndex = -1;
+                }
+                else
+                {
+                    MessageBox.Show("Details are required!!");
+                }
+            }
+            else
+            {
+                MessageBox.Show("First connect to broker");
+            }
+
         }
 
         private void InsertUserData(string username, string password, string deviceId, string topic)
         {
             try
             {
-                    con.Open();
-                    string query = "INSERT INTO users (username, password, Topics, DeviceID, Status) VALUES (@username, @password, @topic, @deviceid, @status)";
+                con.Open();
+                string query = "INSERT INTO users (username, password, Topics, DeviceID, Status) VALUES (@username, @password, @topic, @deviceid, @status)";
 
-                    using (MySqlCommand command = new MySqlCommand(query, con))
+                using (MySqlCommand command = new MySqlCommand(query, con))
+                {
+                    command.Parameters.AddWithValue("@username", username);
+                    command.Parameters.AddWithValue("@password", password);
+                    command.Parameters.AddWithValue("@deviceid", deviceId);
+                    command.Parameters.AddWithValue("@topic", topic);
+                    command.Parameters.AddWithValue("@status", 1);
+
+                    int rowsAffected = command.ExecuteNonQuery();
+
+                    if (rowsAffected > 0)
                     {
-                        command.Parameters.AddWithValue("@username", username);
-                        command.Parameters.AddWithValue("@password", password);
-                        command.Parameters.AddWithValue("@deviceid", deviceId);
-                        command.Parameters.AddWithValue("@topic", topic);
-                        command.Parameters.AddWithValue("@status", 1);
-
-                        int rowsAffected = command.ExecuteNonQuery();
-
-                        if (rowsAffected > 0)
+                        MessageBox.Show("User added successfully!");
+                        string updateStatusQuery = "UPDATE users SET status = 1 WHERE DeviceID = @deviceId";
+                        using (MySqlCommand updateStatusCommand = new MySqlCommand(updateStatusQuery, con))
                         {
-                            MessageBox.Show("User added successfully!");
-                            string updateStatusQuery = "UPDATE users SET status = 1 WHERE DeviceID = @deviceId";
-                            using (MySqlCommand updateStatusCommand = new MySqlCommand(updateStatusQuery, con))
-                            {
-                                updateStatusCommand.Parameters.AddWithValue("@deviceId", deviceId);
-                                updateStatusCommand.ExecuteNonQuery();
-                            }
-                            LoadUsersData();
+                            updateStatusCommand.Parameters.AddWithValue("@deviceId", deviceId);
+                            updateStatusCommand.ExecuteNonQuery();
                         }
-                        else
-                        {
-                            MessageBox.Show("Failed to add user. Please check your inputs.");
-                        }
+                        LoadUsersData();
                     }
-                
+                    else
+                    {
+                        MessageBox.Show("Failed to add user. Please check your inputs.");
+                    }
+                }
+
             }
             catch (Exception ex)
             {
@@ -328,8 +429,37 @@ namespace AdminBMC
             }
         }
 
-        
+        private void ToggleUserStatus(int rowIndex)
+        {
+            try
+            {
+                con.Open();
 
-        
+                // Get the topic and current status from the DataGridView
+                string device = users1.Rows[rowIndex].Cells["DeviceID"].Value.ToString();
+                int currentStatus = Convert.ToInt32(users1.Rows[rowIndex].Cells["Status"].Value);
+
+                // Toggle the status (0 to 1, 1 to 0)
+                int newStatus = 1 - currentStatus;
+
+                // Update the status in the DataGridView
+                users1.Rows[rowIndex].Cells["Status"].Value = newStatus;
+
+                // Update the status in the database
+                string updateQuery = "UPDATE users SET Status = @Status WHERE DeviceID = @device";
+                MySqlCommand cmd = new MySqlCommand(updateQuery, con);
+                cmd.Parameters.AddWithValue("@Status", newStatus);
+                cmd.Parameters.AddWithValue("@device", device);
+                cmd.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error updating status: {ex.Message}");
+            }
+            finally
+            {
+                con.Close();
+            }
+        }
     }
 }
