@@ -23,7 +23,7 @@ namespace AdminBMC
         //private List<MessageData> messages = new List<MessageData>();
 
         // MySQL connection
-        MySqlConnection con = new MySqlConnection("SERVER = 192.168.240.145; DATABASE = sys; UID = db; PASSWORD = Saks@2468;");
+        MySqlConnection con = new MySqlConnection("SERVER = 192.168.56.1; DATABASE = sys; UID = db; PASSWORD = Saks@2468;");
 
         // DeviceId field
         private string deviceId;
@@ -37,23 +37,6 @@ namespace AdminBMC
             subscribeTopic.CellContentClick += SubscribeTopic_CellContentClick; ;
             users1.CellContentClick += Users_CellContentClick; ;
         }
-
-        private void Users_CellContentClick(object? sender, DataGridViewCellEventArgs e)
-        {
-            if (e.RowIndex >= 0 && e.ColumnIndex == 5)
-            {
-                ToggleUserStatus(e.RowIndex);
-            }
-        }
-
-        private void SubscribeTopic_CellContentClick(object? sender, DataGridViewCellEventArgs e)
-        {
-            if (e.RowIndex >= 0 && e.ColumnIndex == 2)
-            {
-                ToggleSubscriptionStatus(e.RowIndex);
-            }
-        }
-
         private void Form1_FormClosing(object? sender, FormClosingEventArgs e)
         {
             if (connect)
@@ -430,6 +413,20 @@ namespace AdminBMC
             }
         }
 
+        private void SubscribeTopic_CellContentClick(object? sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex >= 0 && e.ColumnIndex == 2)
+            {
+                ToggleSubscriptionStatus(e.RowIndex);
+            }
+        }
+        private void Users_CellContentClick(object? sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex >= 0 && e.ColumnIndex == 5)
+            {
+                ToggleUserStatus(e.RowIndex);
+            }
+        }
         private void ToggleUserStatus(int rowIndex)
         {
             try
@@ -462,7 +459,6 @@ namespace AdminBMC
                 con.Close();
             }
         }
-
         private void searchBtn_Click(object sender, EventArgs e)
         {
             if (!string.IsNullOrEmpty(searchText.Text))
