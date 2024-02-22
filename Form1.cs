@@ -23,7 +23,7 @@ namespace AdminBMC
         //private List<MessageData> messages = new List<MessageData>();
 
         // MySQL connection
-        MySqlConnection con = new MySqlConnection("SERVER = 192.168.56.1; DATABASE = sys; UID = db; PASSWORD = Saks@2468;");
+        MySqlConnection con = new MySqlConnection("SERVER = 192.168.1.15; DATABASE = sys; UID = db; PASSWORD = Saks@2468;");
 
         // DeviceId field
         private string deviceId;
